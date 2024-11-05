@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { TextField, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography } from '@mui/material';
+import { TextField, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, CircularProgress } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 
 function Cidades() {
   const [cidades, setCidades] = useState([]);
   const [search, setSearch] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const exemploCidades = [
@@ -15,18 +16,21 @@ function Cidades() {
   ];
 
   useEffect(() => {
-    const fetchCidades = async () => {
-      try {
-        const response = await axios.get('http://localhost:8080/api/cidades');
-        setCidades(response.data);
-      } catch (error) {
-        console.error("Erro ao buscar cidades:", error);
-        setCidades(exemploCidades);
-      }
-    };
-
     fetchCidades();
   }, []);
+
+  const fetchCidades = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get('http://localhost:8080/api/cidades');
+      setCidades(response.data);
+    } catch (error) {
+      console.error("Erro ao buscar cidades:", error);
+      setCidades(exemploCidades); // Usar exemplo em caso de erro
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSearchChange = (event) => {
     setSearch(event.target.value);
@@ -65,48 +69,58 @@ function Cidades() {
 
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '20px' }}>
         <TextField
-          label="Cidade, estado, país..."
+          label="Buscar cidade, estado, país..."
           variant="outlined"
           size="small"
           value={search}
           onChange={handleSearchChange}
           style={{ marginRight: '10px', width: '300px' }}
         />
-        <Button variant="contained" color="primary" style={{ backgroundColor: '#FF6B6B' }} onClick={handleCadastrarCidade}>
+        <Button variant="contained" color="primary" style={{ backgroundColor: '#FF6B6B', marginRight: '10px' }} onClick={handleCadastrarCidade}>
           Cadastrar Cidade
+        </Button>
+        <Button variant="outlined" color="primary" onClick={fetchCidades}>
+          Atualizar
         </Button>
       </div>
 
-      <TableContainer component={Paper} style={{ maxWidth: '800px', margin: '0 auto' }}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell style={{ fontWeight: 'bold' }}>Cidade</TableCell>
-              <TableCell style={{ fontWeight: 'bold' }}>Estado</TableCell>
-              <TableCell style={{ fontWeight: 'bold' }}>País</TableCell>
-              <TableCell style={{ fontWeight: 'bold' }}>Ações</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {filteredCidades.map((cidade) => (
-              <TableRow key={cidade.id} hover>
-                <TableCell>{cidade.nome}</TableCell>
-                <TableCell>{cidade.estado}</TableCell>
-                <TableCell>{cidade.pais}</TableCell>
-                <TableCell>
-                  <Button 
-                    variant="outlined" 
-                    color="secondary" 
-                    onClick={() => handleDelete(cidade.id)}
-                  >
-                    Remover
-                  </Button>
-                </TableCell>
+      {loading ? (
+        <div style={{ marginTop: '20px' }}>
+          <CircularProgress />
+          <Typography variant="body1" style={{ marginTop: '10px' }}>Carregando cidades...</Typography>
+        </div>
+      ) : (
+        <TableContainer component={Paper} style={{ maxWidth: '800px', margin: '0 auto', marginTop: '20px' }}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell style={{ fontWeight: 'bold' }}>Cidade</TableCell>
+                <TableCell style={{ fontWeight: 'bold' }}>Estado</TableCell>
+                <TableCell style={{ fontWeight: 'bold' }}>País</TableCell>
+                <TableCell style={{ fontWeight: 'bold' }}>Ações</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {filteredCidades.map((cidade) => (
+                <TableRow key={cidade.id} hover>
+                  <TableCell>{cidade.nome}</TableCell>
+                  <TableCell>{cidade.estado}</TableCell>
+                  <TableCell>{cidade.pais}</TableCell>
+                  <TableCell>
+                    <Button 
+                      variant="outlined" 
+                      color="secondary" 
+                      onClick={() => handleDelete(cidade.id)}
+                    >
+                      Remover
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
     </div>
   );
 }
