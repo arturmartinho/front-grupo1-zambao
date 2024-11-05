@@ -1,12 +1,12 @@
-// src/pages/ReservasPorHotel.js
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Typography, Container, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, MenuItem, Select, FormControl, InputLabel } from '@mui/material';
+import { Typography, Container, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, MenuItem, Select, FormControl, InputLabel, CircularProgress } from '@mui/material';
 
 function ReservasPorHotel() {
   const [hoteis, setHoteis] = useState([]);
   const [reservas, setReservas] = useState([]);
   const [hotelSelecionado, setHotelSelecionado] = useState('');
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchHoteis = async () => {
@@ -24,11 +24,14 @@ function ReservasPorHotel() {
   useEffect(() => {
     if (hotelSelecionado) {
       const fetchReservas = async () => {
+        setLoading(true);
         try {
           const response = await axios.get(`http://localhost:5000/api/v1/reserva?idHotel=${hotelSelecionado}`);
           setReservas(response.data.content);
         } catch (error) {
           console.error("Erro ao buscar reservas:", error);
+        } finally {
+          setLoading(false);
         }
       };
 
@@ -58,8 +61,13 @@ function ReservasPorHotel() {
         </Select>
       </FormControl>
 
-      {reservas.length > 0 ? (
-        <TableContainer component={Paper}>
+      {loading ? (
+        <div style={{ marginTop: '20px' }}>
+          <CircularProgress />
+          <Typography variant="body1" style={{ marginTop: '10px' }}>Carregando reservas...</Typography>
+        </div>
+      ) : reservas.length > 0 ? (
+        <TableContainer component={Paper} style={{ marginTop: '20px' }}>
           <Table>
             <TableHead>
               <TableRow>
@@ -71,7 +79,7 @@ function ReservasPorHotel() {
             </TableHead>
             <TableBody>
               {reservas.map((reserva) => (
-                <TableRow key={reserva.id}>
+                <TableRow key={reserva.id} hover sx={{ '&:hover': { backgroundColor: '#FFEBEE' } }}>
                   <TableCell>{reserva.id}</TableCell>
                   <TableCell>{reserva.dataReserva}</TableCell>
                   <TableCell>{reserva.usuario.nome}</TableCell>
