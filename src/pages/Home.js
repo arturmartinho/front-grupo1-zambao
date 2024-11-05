@@ -1,10 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Button } from '@mui/material';
 
 function Home() {
   return (
     <div style={{ textAlign: 'center', marginTop: '50px' }}>
-      <h1>Bem-vindo ao Sistema de Gerenciamento de Hotéis e Cidades</h1>
+      <h1 style={{color: '#FF5A60' }}>Bem-vindo ao HotelHub</h1>
       <div style={{ marginTop: '20px' }}>
         <Link to="/cidades">
           <button style={{ margin: '10px', padding: '10px 20px' }}>Gerenciar Cidades</button>

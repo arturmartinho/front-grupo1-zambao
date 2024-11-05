@@ -25,7 +25,7 @@ function ReservasPorHotel() {
     if (hotelSelecionado) {
       const fetchReservas = async () => {
         try {
-          const response = await axios.get(`http://localhost:5000/api/v1/reserva?idHotel=${hotelSelecionado}`);
+          const response = await axios.get(`http://localhost:8081/api/v1/reserva?idHotel=${hotelSelecionado}`);
           setReservas(response.data.content);
         } catch (error) {
           console.error("Erro ao buscar reservas:", error);
@@ -66,16 +66,18 @@ function ReservasPorHotel() {
                 <TableCell style={{ fontWeight: 'bold' }}>ID da Reserva</TableCell>
                 <TableCell style={{ fontWeight: 'bold' }}>Data da Reserva</TableCell>
                 <TableCell style={{ fontWeight: 'bold' }}>Nome do Usuário</TableCell>
-                <TableCell style={{ fontWeight: 'bold' }}>Quantidade de Pessoas</TableCell>
+                <TableCell style={{ fontWeight: 'bold' }}>Valor Total</TableCell>
+                <TableCell style={{ fontWeight: 'bold' }}>Número de Diarias</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {reservas.map((reserva) => (
                 <TableRow key={reserva.id}>
                   <TableCell>{reserva.id}</TableCell>
-                  <TableCell>{reserva.dataReserva}</TableCell>
+                  <TableCell>{reserva.data}</TableCell>
                   <TableCell>{reserva.usuario.nome}</TableCell>
-                  <TableCell>{reserva.quantidadePessoas}</TableCell>
+                  <TableCell>{reserva.valorTotal}</TableCell>
+                  <TableCell>{reserva.numeroDiaria}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
