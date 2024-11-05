@@ -1,23 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { TextField, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography } from '@mui/material';
+import { TextField, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, CircularProgress } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 
 function Hoteis() {
   const [hoteis, setHoteis] = useState([]);
   const [search, setSearch] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchHoteis = async () => {
-      try {
-        const response = await axios.get('http://localhost:8080/api/hotels');
-        setHoteis(response.data);
-      } catch (error) {
-        console.error("Erro ao buscar hotéis:", error);
-      }
-    };
+  const exemploHoteis = [
+    { id: 1, nome: 'Hotel São Paulo', endereco: 'Av. Paulista, 1000', capacidade: 100, precoPorDiaria: 200, cidade: { nome: 'São Paulo' } },
+    { id: 2, nome: 'New York Hotel', endereco: '5th Avenue, 200', capacidade: 150, precoPorDiaria: 300, cidade: { nome: 'Nova Iorque' } },
+    { id: 3, nome: 'Hotel Brasília', endereco: 'Setor Hoteleiro Norte', capacidade: 80, precoPorDiaria: 150, cidade: { nome: 'Brasília' } },
+  ];
 
+  const fetchHoteis = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get('http://localhost:8080/api/hotels');
+      setHoteis(response.data);
+    } catch (error) {
+      console.error("Erro ao buscar hotéis:", error);
+      setHoteis(exemploHoteis); // Fallback em caso de erro
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchHoteis();
   }, []);
 
@@ -66,45 +77,81 @@ function Hoteis() {
           onChange={handleSearchChange}
           style={{ marginRight: '10px', width: '300px' }}
         />
-        <Button variant="contained" color="primary" style={{ backgroundColor: '#FF6B6B' }} onClick={handleCadastrarHotel}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleCadastrarHotel}
+          sx={{
+            backgroundColor: '#FF6B6B',
+            '&:hover': {
+              backgroundColor: '#FF4C4C',
+            },
+            marginRight: '10px'
+          }}
+        >
           Cadastrar Hotel
+        </Button>
+        <Button
+          variant="outlined"
+          color="primary"
+          onClick={fetchHoteis}
+          sx={{
+            '&:hover': {
+              backgroundColor: '#E0E0E0',
+            }
+          }}
+        >
+          Atualizar
         </Button>
       </div>
 
-      <TableContainer component={Paper} style={{ maxWidth: '800px', margin: '0 auto' }}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell style={{ fontWeight: 'bold' }}>Nome</TableCell>
-              <TableCell style={{ fontWeight: 'bold' }}>Endereço</TableCell>
-              <TableCell style={{ fontWeight: 'bold' }}>Capacidade</TableCell>
-              <TableCell style={{ fontWeight: 'bold' }}>Preço por Diária</TableCell>
-              <TableCell style={{ fontWeight: 'bold' }}>Cidade</TableCell>
-              <TableCell style={{ fontWeight: 'bold' }}>Ações</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {filteredHoteis.map((hotel) => (
-              <TableRow key={hotel.id} hover>
-                <TableCell>{hotel.nome}</TableCell>
-                <TableCell>{hotel.endereco}</TableCell>
-                <TableCell>{hotel.capacidade}</TableCell>
-                <TableCell>{hotel.precoPorDiaria}</TableCell>
-                <TableCell>{hotel.cidade.nome}</TableCell>
-                <TableCell>
-                  <Button 
-                    variant="outlined" 
-                    color="secondary" 
-                    onClick={() => handleDelete(hotel.id)}
-                  >
-                    Remover
-                  </Button>
-                </TableCell>
+      {loading ? (
+        <div style={{ marginTop: '20px' }}>
+          <CircularProgress />
+          <Typography variant="body1" style={{ marginTop: '10px' }}>Carregando hotéis...</Typography>
+        </div>
+      ) : (
+        <TableContainer component={Paper} style={{ maxWidth: '800px', margin: '0 auto', marginTop: '20px' }}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell style={{ fontWeight: 'bold' }}>Nome</TableCell>
+                <TableCell style={{ fontWeight: 'bold' }}>Endereço</TableCell>
+                <TableCell style={{ fontWeight: 'bold' }}>Capacidade</TableCell>
+                <TableCell style={{ fontWeight: 'bold' }}>Preço por Diária</TableCell>
+                <TableCell style={{ fontWeight: 'bold' }}>Cidade</TableCell>
+                <TableCell style={{ fontWeight: 'bold' }}>Ações</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {filteredHoteis.map((hotel) => (
+                <TableRow key={hotel.id} hover>
+                  <TableCell>{hotel.nome}</TableCell>
+                  <TableCell>{hotel.endereco}</TableCell>
+                  <TableCell>{hotel.capacidade}</TableCell>
+                  <TableCell>{hotel.precoPorDiaria}</TableCell>
+                  <TableCell>{hotel.cidade.nome}</TableCell>
+                  <TableCell>
+                    <Button 
+                      variant="outlined" 
+                      color="secondary" 
+                      onClick={() => handleDelete(hotel.id)}
+                      sx={{
+                        '&:hover': {
+                          backgroundColor: '#FFDDDD',
+                          color: '#FF4C4C'
+                        }
+                      }}
+                    >
+                      Remover
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
     </div>
   );
 }
