@@ -1,25 +1,41 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { TextField, Button, Typography, Container } from '@mui/material';
+import { TextField, Button, Typography, Container, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
 import { useNavigate, Link } from 'react-router-dom';
 
-function CadastrarCidade() {
+function CadastrarHotel() {
   const [nome, setNome] = useState('');
-  const [estado, setEstado] = useState('');
-  const [pais, setPais] = useState('');
+  const [endereco, setEndereco] = useState('');
+  const [capacidade, setCapacidade] = useState('');
+  const [precoPorDiaria, setPrecoPorDiaria] = useState('');
+  const [cidadeId, setCidadeId] = useState('');
+  const [cidades, setCidades] = useState([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchCidades = async () => {
+      try {
+        const response = await axios.get('http://localhost:8080/api/cidades');
+        setCidades(response.data);
+      } catch (error) {
+        console.error("Erro ao buscar cidades:", error);
+      }
+    };
+
+    fetchCidades();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const novaCidade = { nome, estado, pais };
+    const novoHotel = { nome, endereco, capacidade, precoPorDiaria, cidadeId };
 
     try {
-      await axios.post('http://localhost:8080/api/cidades', novaCidade);
-      alert('Cidade cadastrada com sucesso!');
-      navigate('/cidades');
+      await axios.post('http://localhost:8080/api/hotels', novoHotel);
+      alert('Hotel cadastrado com sucesso!');
+      navigate('/hoteis');
     } catch (error) {
-      console.error("Erro ao cadastrar cidade:", error);
-      alert('Erro ao cadastrar cidade. Tente novamente.');
+      console.error("Erro ao cadastrar hotel:", error);
+      alert('Erro ao cadastrar hotel. Tente novamente.');
     }
   };
 
@@ -40,29 +56,64 @@ function CadastrarCidade() {
           style={{ marginBottom: '20px' }}
         />
         <TextField
-          label="Estado"
+          label="Endereço"
           variant="outlined"
           fullWidth
           required
-          value={estado}
-          onChange={(e) => setEstado(e.target.value)}
+          value={endereco}
+          onChange={(e) => setEndereco(e.target.value)}
           style={{ marginBottom: '20px' }}
         />
         <TextField
-          label="País"
+          label="Capacidade"
           variant="outlined"
           fullWidth
           required
-          value={pais}
-          onChange={(e) => setPais(e.target.value)}
+          type="number"
+          value={capacidade}
+          onChange={(e) => setCapacidade(e.target.value)}
           style={{ marginBottom: '20px' }}
         />
-        <Button type="submit" variant="contained" style={{ backgroundColor: '#FF6B6B', color: '#FFFFFF' }}>
-          Cadastrar Cidade
+        <TextField
+          label="Preço por Diária"
+          variant="outlined"
+          fullWidth
+          required
+          type="number"
+          value={precoPorDiaria}
+          onChange={(e) => setPrecoPorDiaria(e.target.value)}
+          style={{ marginBottom: '20px' }}
+        />
+        <FormControl fullWidth required style={{ marginBottom: '20px' }}>
+          <InputLabel>Cidade</InputLabel>
+          <Select
+            value={cidadeId}
+            onChange={(e) => setCidadeId(e.target.value)}
+            label="Cidade"
+          >
+            {cidades.map((cidade) => (
+              <MenuItem key={cidade.id} value={cidade.id}>
+                {cidade.nome}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <Button
+          type="submit"
+          variant="contained"
+          sx={{
+            backgroundColor: '#FF6B6B',
+            color: '#FFFFFF',
+            '&:hover': {
+              backgroundColor: '#FF4C4C',
+            },
+          }}
+        >
+          Cadastrar Hotel
         </Button>
       </form>
     </Container>
   );
 }
 
-export default CadastrarCidade;
+export default CadastrarHotel;

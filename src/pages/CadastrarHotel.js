@@ -98,7 +98,17 @@ function CadastrarHotel() {
             ))}
           </Select>
         </FormControl>
-        <Button type="submit" variant="contained" style={{ backgroundColor: '#FF6B6B', color: '#FFFFFF' }}>
+        <Button
+          type="submit"
+          variant="contained"
+          sx={{
+            backgroundColor: '#FF6B6B',
+            color: '#FFFFFF',
+            '&:hover': {
+              backgroundColor: '#FF4C4C',
+            },
+          }}
+        >
           Cadastrar Hotel
         </Button>
       </form>
