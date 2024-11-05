@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import Home from './pages/Home';
 import Cidades from './pages/Cidades';
 import Hoteis from './pages/Hoteis';
-import Reservas from './pages/Reservas';
+import Reservas from './pages/ReservasPorHotel';
 import CadastrarCidade from './pages/CadastrarCidade';
 import CadastrarHotel from './pages/CadastrarHotel';
 
